@@ -1,0 +1,60 @@
+#! /bin/sh -eu
+
+#
+# clip-by-line
+#
+# For those times when you really don't want to be interrupted in the
+# middle of your wall of text (but still want to give people the
+# ability to reply to paragraphs individually without screwing around
+# with quotation blocks).
+#
+
+usage() {
+	echo "Usage:"
+	echo "\
+	$0: read a series of lines from standard input and copy them to the
+	clipboard one at a time, waiting for user input before replacing
+	one line with the next."
+	echo "\
+
+Examples:
+"
+	echo "\
+Enter a message line by line, then copy it to the clipboard one
+line at a time:
+
+	$0 <<EOF
+	Hi! This is the first line. Hit enter to replace it with the next...
+	...and here it is.
+
+	Bye!
+	EOF"
+
+	echo
+	echo "\
+Read a long textfile into the clipboard one line at a time
+(useful for convincing your less-technically-literate friends of
+your superhuman ability to memorize poetry).
+
+	$0 < "'$(cat /usr/share/doc/entire-works-of-shakespeare-for-some-reason.txt)'""
+	exit 2
+}
+
+[ "$#" -gt 0 ] && usage || :
+
+COUNTER=0
+
+grep . \
+	| while read line
+do
+	echo "${line}" \
+		| tr -d '\n' \
+		| xclip -sel clip
+	echo "Clipped (line ${COUNTER}):"
+	echo | tr '\n' '\t'
+	xclip -sel clip -o
+	echo
+	echo -n "[enter to load next line]"
+	read<&2
+	COUNTER=$(echo "${COUNTER} + 1" | bc)
+done

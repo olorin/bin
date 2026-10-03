@@ -1,0 +1,17 @@
+#! /bin/sh -eu
+
+#
+# create persistent alias
+#
+
+ALIASES="$HOME/.zshrc.d/enabled/alias.sh"
+
+MONIKER="$1"
+TRUENAME="$2"
+
+ALIAS_FRAGMENT=$(mktemp aliases-XXXXXX.sh)
+cat > $ALIAS_FRAGMENT<<EOF
+alias ${MONIKER}="${TRUENAME}"
+EOF
+cat "$ALIAS_FRAGMENT" | tee -a "$ALIASES"
+rm "$ALIAS_FRAGMENT"
