@@ -1,5 +1,0 @@
-#! /bin/sh -eu
-
-S="$1"
-
-tmux has -t $S && tmux attach -t $S || tmux new-session -s $S
